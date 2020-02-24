@@ -39,7 +39,7 @@ object ListExercises {
     *
     * Hint: Refer the construction of list
     */
-  def prependToList[A](x: A, xs: List[A]): List[A] = ???
+  def prependToList[A](x: A, xs: List[A]): List[A] = x :: xs
 
   /**
     * scala> appendToList(1, List(2, 3, 4))
@@ -47,7 +47,7 @@ object ListExercises {
     *
     * Hint: Use the :+ operator
     */
-  def appendToList[A](x: A, xs: List[A]): List[A] = ???
+  def appendToList[A](x: A, xs: List[A]): List[A] = xs :+ x
 
   /**
     * `List` has an `.isEmpty` method that you can call to know whether an instance is empty or not.
@@ -69,7 +69,13 @@ object ListExercises {
     * }
     * ```
     */
-  def isEmptyList[A](xs: List[A]): Boolean = ???
+  def isEmptyList[A](xs: List[A]): Boolean = {
+    xs match {
+      case Nil => true
+      case h::t => false
+//        case _ => false
+    }
+  }
 
   /**
     * scala> showListSize(List(1, 2, 3))
@@ -83,7 +89,13 @@ object ListExercises {
     *
     * Hint: Use pattern matching, string interpolation and length
     */
-  def showListSize[A](xs: List[A]): String = ???
+  def showListSize[A](xs: List[A]): String = {
+    xs match {
+      case Nil => "This is an empty list"
+//      case _ = s"This is a list of size ${xs.length}"
+      case head :: tail => s"This is a list of size ${xs.length}"
+    }
+  }
 
   /**
     * Mapping a function over a List
@@ -96,7 +108,10 @@ object ListExercises {
     *
     * Hint: Use .map
     **/
-  def addNumToEach(num: Int, nums: List[Int]): List[Int] = ???
+  def addNumToEach(num: Int, nums: List[Int]): List[Int] = {
+    nums.map(_+num)
+//    nums.map(x => x + num)
+  }
 
   /**
     * Filter a List
@@ -108,7 +123,9 @@ object ListExercises {
     *
     * Hint: Use .filter and '%' for mod operator
     */
-  def filterEven(nums: List[Int]): List[Int] = ???
+  def filterEven(nums: List[Int]): List[Int] = {
+    nums.filter(_ % 2 ==0)
+  }
 
   /**
     * Folds
@@ -132,7 +149,9 @@ object ListExercises {
     *
     * Hint: Use .foldLeft
     */
-  def product(nums: List[Int]): Int = ???
+  def product(nums: List[Int]): Int = {
+    nums.foldLeft(1)(_*_)
+  }
 
   /**
     * scala> min(List(4, 6, 1))
@@ -143,11 +162,13 @@ object ListExercises {
     *
     * Hint: Use pattern matching and .foldLeft
     **/
-  def min(nums: List[Int]): Int =
+  def min(nums: List[Int]): Int = {
     nums match {
-      case Nil => ???
-      case head :: tail => ???
+      case Nil => Int.MinValue
+      case head::tail => tail.foldLeft(head)((acc, next) => if (acc < next ) acc else next)
     }
+  }
+
 
   private[level03] val peopleList =
     List(Person("Matt Murdock", 30),
@@ -157,7 +178,6 @@ object ListExercises {
       Person("Wilson Fisk", 42),
       Person("Elektra Natchios", 27)
     )
-
   /**
     * Return the person in the List that is the youngest. If there are more than one person with the youngest age,
     * return the first one.
@@ -170,7 +190,13 @@ object ListExercises {
     *
     * Hint: Use pattern matching and .foldLeft
     */
-  def youngestPerson(persons: List[Person]): Person = ???
+  def youngestPerson(persons: List[Person]): Person = {
+    persons match {
+      case Nil => Person("Nobody", 0)
+      case head::tail => tail.foldLeft(head)((acc, next) => if (acc.age <= next.age) acc else next)
+//    persons
+    }
+  }
 
   /**
     * Return a list of pairs of a Person and their position in the `peopleList`.
@@ -192,7 +218,12 @@ object ListExercises {
     *
     * Hint: Use `zipWithIndex`
     */
-  def personWithIndex(people: List[Person]): List[(Person, Int)] = ???
+  def personWithIndex(people: List[Person]): List[(Person, Int)] = {
+//      people.zip(LazyList from 1 )
+    people.zipWithIndex.map{
+      case (p,i) => (p,i+1)
+    }
+  }
 
   /**
     * Log every nth person from the `peopleList` given an index `n`.
@@ -208,7 +239,20 @@ object ListExercises {
     * Hint: Use `personWithIndex`, `filter` and `showPerson`.
     *
     */
-  def showEveryNthPerson(n: Int, persons: List[Person]): List[String] = ???
+
+  def showEveryNthPerson(n: Int, persons: List[Person]): List[String] =
+  {
+    if (n <= 0) {
+      persons.map(showPerson)
+    } else if ( n > persons.length) {
+      Nil
+    } else {
+      personWithIndex(persons).collect {case (e, i) if (i % n) == 0 => e }.map(showPerson)
+    }
+  }
+
+
+
 
   private[level03] def showPerson(person: Person): String =
     person match {
@@ -268,5 +312,12 @@ object ListExercises {
     * Given: val l1 = List("a", "a", "a", "a", "b", "c", "c", "a", "a", "d", "e", "e", "e", "e")
     * sublists(l1) == List(List("a", "a", "a", "a"), List("b"), List("c", "c"), List("a", "a"), List("d"), List("e", "e", "e", "e"))
     */
-  def sublists[A](xs: List[A]): List[List[A]] = ???
+  def sublists[A](xs: List[A]): List[List[A]] = xs.foldLeft(List(List[A]()))((acc, next) => {
+    acc match {
+      case List(List()) => List(List(next)) // List(List("a"))
+      case (h::t)::tail if (h==next) => (h::next::t)::tail
+      case (h::t)::tail  => List(next)::((h::t)::tail)
+      //       case (h::t)::tail (if h != t) => (h::t):: List(next)::tail
+    }
+  }).reverse
 }
