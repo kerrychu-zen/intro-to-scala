@@ -32,10 +32,10 @@ object NullExercises {
     **/
   def mkTrafficLightOrNull(str: String): TrafficLight =
     str match {
-      case "red" => ???
-      case "yellow" => ???
-      case "green" => ???
-      case _ => ???
+      case "red" => Red
+      case "yellow" => Yellow
+      case "green" => Green
+      case _ => null
     }
 
   /**
@@ -55,7 +55,15 @@ object NullExercises {
     *
     * Hint: Use `mkTrafficLightOrNull` and pattern matching
     */
-  def mkTrafficLightOrNullThenShow(str: String): String = ???
+  def mkTrafficLightOrNullThenShow(str: String): String = {
+    val colour = str match {
+      case "red" => str
+      case "green" => str
+      case "yellow" => str
+      case _ => "invalid"
+    }
+    s"Traffic light is $colour"
+  }
 
   /**
     * Write a function that converts values from the real world into a `Person`.
@@ -74,7 +82,15 @@ object NullExercises {
     * scala> mkPersonOrNull("Bob", -1)
     * = null
     **/
-  def mkPersonOrNull(name: String, age: Int): Person = ???
+  def mkPersonOrNull(name: String, age: Int): Person = {
+    if (name.isEmpty || age < 0) {
+      null
+    }
+    else {
+      Person(name, age)
+    }
+
+  }
 
   /**
     * scala> mkPersonOrNullThenChangeName("Bob", 20, "John")
@@ -88,13 +104,22 @@ object NullExercises {
     *
     * Hint: Use `mkPersonOrNull` and `changeName` (already implemented below)
     **/
-  def mkPersonOrNullThenChangeName(oldName: String, age: Int, newName: String): Person = ???
+  def mkPersonOrNullThenChangeName(oldName: String, age: Int, newName: String): Person = {
+    val oldPerson = mkPersonOrNull(oldName, age)
+    changeName(newName, oldPerson)
+  }
 
-  def changeName(newName: String, person: Person): Person = person.copy(name = newName)
 
-  /**
-    * Thought exercise: Does the following function return a `null`?
-    */
-  def mean(nums: List[Int]): Double = ???
+  def changeName(newName: String, person: Person): Person ={
+    if (newName.isEmpty) {
+      null
+    } else if (person == null) {
+      null
+    }
+    else {
+      person.copy(name=newName)
+    }
+  }
 
 }
+
